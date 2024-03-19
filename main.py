@@ -17,17 +17,17 @@ class ticket_GUI:
 
         #Boton seleccion de imagen
         self.btn_imagen = customtkinter.CTkButton(master=self.root,
-                                                    text="Select Image",
+                                                    text="Seleccionar ticke",
                                                     font=("Roboto",14),
                                                     command=self.select_image_file)
         
         self.btn_output_save = customtkinter.CTkButton(master=self.root,
-                                                    text="Select output folder",
+                                                    text="Seleccionar carpeta destino",
                                                     font=("Roboto",14),
                                                     command=self.select_saving_path)
         
         self.btn_open_template = customtkinter.CTkButton(master=self.root,
-                                                    text="open template",
+                                                    text="abrir plantilla",
                                                     font=("Roboto",14),
                                                     command=self.select_template_file)
         
