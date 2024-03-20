@@ -1,14 +1,22 @@
 import customtkinter
 from customtkinter import filedialog
+from pygame import font
+
+def fonts_getting():
+    fonts = font.get_fonts()
+    fonts.sort()
+    return fonts
+
 
 def main():
     ticket_GUI()
-
-
+    
+    
 
 class ticket_GUI:
     def __init__(self):
 
+        self.fonts = fonts_getting()
         #initialize root
         self.root = customtkinter.CTk()
         self.root.geometry("800x500")
@@ -62,6 +70,9 @@ class ticket_GUI:
         #checkboxes
         self.check_letters = customtkinter.CTkCheckBox(master=self.root, text="Incluir letras?")
 
+        #dropdown menu
+        self.dropdown_fonts = customtkinter.CTkComboBox(master=self.root,values=self.fonts)
+        
         
         #posicionamiento de elementos 
 
@@ -73,6 +84,8 @@ class ticket_GUI:
         self.btn_open_template.pack(padx=10,pady=12)
         self.btn_output_save.pack(padx=10,pady=12)
         self.btn_generate.pack(padx=10,pady=12)
+        self.dropdown_fonts.pack(padx=10,pady=12)
+        
 
         self.root.mainloop()
 
