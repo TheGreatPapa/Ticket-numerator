@@ -31,14 +31,29 @@ class ticket_GUI:
                                                     font=("Roboto",14),
                                                     command=self.select_template_file)
         
+        self.btn_generate = customtkinter.CTkButton(master=self.root,
+                                                    text="Generar",
+                                                    font=("Roboto",14),
+                                                    command=self.generate_file)
+        
+
+        #etiquetas
+        #label = customtkinter.CTkLabel(master=frame, text="Login", font=("Roboto",24))
+        
+
+        #checkboxes
+        check_letters = customtkinter.CTkCheckBox(master=self.root, text="Incluir letras?")
+
         
         #posicionamiento de elementos 
         
         
-        
+        #label.pack()
+        check_letters.pack(padx=10,pady=12)
         self.btn_imagen.pack(padx=10,pady=12)
         self.btn_open_template.pack(padx=10,pady=12)
         self.btn_output_save.pack(padx=10,pady=12)
+        self.btn_generate.pack(padx=10,pady=12)
 
         self.root.mainloop()
 
@@ -56,6 +71,10 @@ class ticket_GUI:
         self.image_path = filedialog.askopenfilename(title="Abrir archivo xlsx",
                                                      filetypes=(("Excel (*.xlsx)","*.xlsx"),("Todos los archivos (*.*)","*.*")))
         print(self.image_path)
+
+    def generate_file(self):
+        pass
+
 
 if __name__ == "__main__":
     main()
