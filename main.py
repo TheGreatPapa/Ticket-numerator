@@ -115,7 +115,11 @@ class ticket_GUI:
         self.save_path = filedialog.askdirectory(title="Escoger lugar a guardar imágenes")
     
         if self.save_path:
-            self.text_output.set(self.save_path)
+            if len(self.save_path)> 10:
+                display_save_path = ".../"+ self.save_path.rsplit("/",1)[-1]
+            else:
+                display_save_path = self.save_path
+            self.text_output.set(display_save_path)
         #print(self.save_path)
 
     def select_template_file(self):
