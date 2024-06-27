@@ -1,8 +1,10 @@
 import customtkinter as ctk
+import openpyxl
 from customtkinter import filedialog
 from pygame import font
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
+
 
 
 
@@ -187,8 +189,30 @@ class ticket_GUI:
         if not self.font_path or not self.save_path or not self.template_path or not self.image_path:
             WarningDialog(self.root, "Seleccione todos los archivos correctamente")
         else:
-            include_letters = self.chk_letters.get()
+            if self.chk_letters.get():
+                max_column = 2
+            else:
+                max_column = 1
             
+            #open excel template
+            # Load the workbook and select the first sheet
+            workbook = openpyxl.load_workbook(self.template_path)
+            sheet = workbook.active
+            # Initialize a list to store the values
+            data_values = []
+
+            # Iterate through the rows of the first two columns
+            for row in sheet.iter_rows(min_row=1, min_col=1, max_col=max_column, values_only=True):
+                # Append the tuple (value1, value2) to the list
+                if self.chk_letters.get():
+                    data_values.append(row)
+                else:
+                    data_values.append(row[0])
+
+            print(data_values)
+            return
+
+
             #open image template
             template = Image.open(self.image_path)
             draw = ImageDraw.Draw(template)
