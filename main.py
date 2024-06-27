@@ -49,7 +49,6 @@ class ticket_GUI:
         self.font_path = ""
         
 
-
         # Text variables
         self.text_template = ctk.StringVar()
         self.text_output = ctk.StringVar()
@@ -86,6 +85,8 @@ class ticket_GUI:
                                                text="abrir plantilla",
                                                font=("Roboto", 14),
                                                command=self.select_template_file)
+        
+       
         
         # Labels
         self.label_template = ctk.CTkLabel(master=self.frame,
@@ -126,11 +127,20 @@ class ticket_GUI:
                                           font=("Roboto", 14),
                                           command=self.generate_file,
                                           fg_color="green")
-        self.btn_generate.pack(padx=10, pady=12)
-
-        self.root.mainloop()
-       
         
+
+         # Create a new frame for the letters checkbox
+        self.frame_checkbox = ctk.CTkFrame(self.root)
+        self.frame_checkbox.pack(padx=10, pady=12, fill="x")
+        #checkbox
+        self.chk_letters = ctk.CTkCheckBox(master=self.frame_checkbox,
+                                           text="Incluir letras?", 
+                                           font=("Roboto",14))
+        
+        
+        self.chk_letters.pack(padx=10,pady=12)
+        self.btn_generate.pack(padx=10, pady=12)
+               
 
         self.root.mainloop()
 
@@ -177,6 +187,8 @@ class ticket_GUI:
         if not self.font_path or not self.save_path or not self.template_path or not self.image_path:
             WarningDialog(self.root, "Seleccione todos los archivos correctamente")
         else:
+            include_letters = self.chk_letters.get()
+            
             #open image template
             template = Image.open(self.image_path)
             draw = ImageDraw.Draw(template)
