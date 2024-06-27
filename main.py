@@ -2,6 +2,7 @@ import customtkinter as ctk
 from customtkinter import filedialog
 from pygame import font
 from pathlib import Path
+from PIL import Image, ImageDraw, ImageFont
 
 
 
@@ -172,18 +173,35 @@ class ticket_GUI:
 
             
     def generate_file(self):
-        print(self.font_path)
-        print(self.save_path)
-        print(self.template_path)
-        print(self.image_path)
-
+       
         if not self.font_path or not self.save_path or not self.template_path or not self.image_path:
             WarningDialog(self.root, "Seleccione todos los archivos correctamente")
         else:
-            pass
+            #open image template
+            template = Image.open(self.image_path)
+            draw = ImageDraw.Draw(template)
 
+            #define font and size
+            font = ImageFont.truetype(self.font_path, size=100)
     
+            # Define the position where you want to place the number
+            x_position = 90
+            y_position = 220
 
+            #iterations
+            num_tickets = 10
+            # Loop through each ticket
+            for i in range(num_tickets):
+                # Draw the number on the ticket
+                draw.text((x_position, y_position), str(i), fill="white", font=font)
+                
+                # Save the ticket with the number
+                ticket_path = f"{self.save_path}/ticket_{i}.png"
+                template.save(ticket_path)
+                
+                # Open the template again for the next iteration
+                template = Image.open(self.image_path)
+                draw = ImageDraw.Draw(template)
 
 if __name__ == "__main__":
     main()
