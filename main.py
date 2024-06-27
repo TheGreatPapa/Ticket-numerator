@@ -56,6 +56,7 @@ class ticket_GUI:
         self.text_output = ctk.StringVar()
         self.text_image = ctk.StringVar()
         self.text_font = ctk.StringVar()
+        self.tb_color = ctk.StringVar()
 
         # Initialize text variables
         self.text_template.set("No seleccionado")
@@ -87,7 +88,6 @@ class ticket_GUI:
                                                text="abrir plantilla",
                                                font=("Roboto", 14),
                                                command=self.select_template_file)
-        
        
         
         # Labels
@@ -106,6 +106,15 @@ class ticket_GUI:
         self.label_font = ctk.CTkLabel(master=self.frame,
                                        textvariable=self.text_font,
                                        font=("Roboto", 14))
+        self.label_hex = ctk.CTkLabel(master=self.frame,
+                                       text="Color #HEX value (FFFFFF)",
+                                       font=("Roboto", 14))
+        
+        #textboxes
+        self.color_entry = ctk.CTkEntry(master=self.frame,
+                                        textvariable=self.tb_color,
+                                        placeholder_text="#HEX value (FFFFFF)")
+        
         
         # Positioning elements with grid
         self.btn_output_save.grid(row=0, column=0, padx=10, pady=12)
@@ -119,6 +128,9 @@ class ticket_GUI:
         
         self.btn_open_template.grid(row=3, column=0, padx=10, pady=12)
         self.label_template.grid(row=3, column=1, padx=10, pady=12)
+
+        self.label_hex.grid(row=4,column=0,padx=10,pady=12)
+        self.color_entry.grid(row=4,column=1, padx=10, pady=12)
 
         # Create a new frame for the generate button
         self.frame_generate = ctk.CTkFrame(self.root)
@@ -194,6 +206,10 @@ class ticket_GUI:
             else:
                 max_column = 1
             
+            colour = self.tb_color.get()
+            if not colour:
+                colour = "ffffff"
+        
             #open excel template
             # Load the workbook and select the first sheet
             workbook = openpyxl.load_workbook(self.template_path)
@@ -205,14 +221,11 @@ class ticket_GUI:
             for row in sheet.iter_rows(min_row=1, min_col=1, max_col=max_column, values_only=True):
                 # Append the tuple (value1, value2) to the list
                 if self.chk_letters.get():
-                    data_values.append(row)
+                    
+                    data_values.append([row[0],row[1]])
                 else:
                     data_values.append(row[0])
-
-            print(data_values)
-            return
-
-
+            
             #open image template
             template = Image.open(self.image_path)
             draw = ImageDraw.Draw(template)
@@ -221,23 +234,42 @@ class ticket_GUI:
             font = ImageFont.truetype(self.font_path, size=100)
     
             # Define the position where you want to place the number
-            x_position = 90
-            y_position = 220
+            x1_position = 90
+            y1_position = 220
+            x2_position = 90
+            y2_position = 400
 
             #iterations
-            num_tickets = 10
+            num_tickets = len(data_values)
             # Loop through each ticket
-            for i in range(num_tickets):
-                # Draw the number on the ticket
-                draw.text((x_position, y_position), str(i), fill="white", font=font)
-                
-                # Save the ticket with the number
-                ticket_path = f"{self.save_path}/ticket_{i}.png"
-                template.save(ticket_path)
-                
-                # Open the template again for the next iteration
-                template = Image.open(self.image_path)
-                draw = ImageDraw.Draw(template)
+
+            if self.chk_letters.get():
+                for i in range(num_tickets):
+                    # Draw the number on the ticket
+                    draw.text((x1_position, y1_position), str(data_values[i][0]), fill=f"#{colour}", font=font)
+                    draw.text((x2_position, y2_position), str(data_values[i][1]), fill=f"#{colour}", font=font)
+                    
+                    # Save the ticket with the number
+                    ticket_path = f"{self.save_path}/ticket_{i}.png"
+                    template.save(ticket_path)
+                    
+                    # Open the template again for the next iteration
+                    template = Image.open(self.image_path)
+                    draw = ImageDraw.Draw(template)
+            else:
+                for i in range(num_tickets):
+                    # Draw the number on the ticket
+                    draw.text((x1_position, y1_position), str(data_values[i]), fill=f"#{colour}", font=font)
+                    
+                    # Save the ticket with the number
+                    ticket_path = f"{self.save_path}/ticket_{i}.png"
+                    template.save(ticket_path)
+                    
+                    # Open the template again for the next iteration
+                    template = Image.open(self.image_path)
+                    draw = ImageDraw.Draw(template)
+
+            
 
 if __name__ == "__main__":
     main()
