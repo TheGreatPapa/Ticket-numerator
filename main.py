@@ -8,15 +8,46 @@ from pathlib import Path
 def main():
     ticket_GUI()
     
-    
+class WarningDialog(ctk.CTkToplevel):
+    def __init__(self, parent, message):
+        super().__init__(parent)
+        self.title("Warning")
+        self.geometry("400x150")
+        self.resizable(False, False)
+
+        self.label = ctk.CTkLabel(self, text=message, font=("Roboto", 14))
+        self.label.pack(padx=20, pady=20)
+
+        self.btn_ok = ctk.CTkButton(self, text="Bueno :(", command=self.on_ok)
+        self.btn_ok.pack(pady=10)
+
+        # Make the dialog modal
+        self.grab_set()
+        self.focus_set()
+        self.transient(parent)
+        self.bell()  # Make default warning sound
+
+    def on_ok(self):
+        self.grab_release()
+        self.destroy()
 
 class ticket_GUI:
+
+    
+
     def __init__(self):
 
         #initialize root
         self.root = ctk.CTk()
         self.root.geometry("800x500")
         
+        #ticketing variables
+        self.image_path= ""
+        self.save_path = ""
+        self.template_path = ""
+        self.font_path = ""
+        
+
 
         # Text variables
         self.text_template = ctk.StringVar()
@@ -102,6 +133,8 @@ class ticket_GUI:
 
         self.root.mainloop()
 
+
+
     #select the image through a windows filedialog
     def select_image_file(self):
         self.image_path = filedialog.askopenfilename(title="Abrir archivo PNG",
@@ -109,7 +142,7 @@ class ticket_GUI:
         if self.image_path:
             display_image = Path(self.image_path).name
             self.text_image.set(display_image)
-        #print(self.image_path)
+
 
     def select_saving_path(self):
         self.save_path = filedialog.askdirectory(title="Escoger lugar a guardar imágenes")
@@ -120,26 +153,36 @@ class ticket_GUI:
             else:
                 display_save_path = self.save_path
             self.text_output.set(display_save_path)
-        #print(self.save_path)
+             
 
     def select_template_file(self):
         self.template_path = filedialog.askopenfilename(title="Abrir archivo xlsx",
-                                                     filetypes=(("Excel (*.xlsx)","*.xlsx"),("Todos los archivos (*.*)","*.*")))
-        
+                                                     filetypes=(("Excel (*.xlsx)","*.xlsx"),("Todos los archivos (*.*)","*.*")))        
         if self.template_path:
             display_template = Path(self.template_path).name
-            self.text_template.set(display_template)
+            self.text_template.set(display_template)     
+
 
     def select_font_file(self):
         self.font_path = filedialog.askopenfilename(title="Seleccionar archivo Font",
                                                      filetypes=(("Font file (*.ttf)","*.ttf"),("Font file (*.TTF)","*.TTF"),("Todos los archivos (*.*)","*.*")))
-        print(self.font_path)
         if self.font_path:
             display_font = Path(self.font_path).name
             self.text_font.set(display_font)
+
             
     def generate_file(self):
-        pass
+        print(self.font_path)
+        print(self.save_path)
+        print(self.template_path)
+        print(self.image_path)
+
+        if not self.font_path or not self.save_path or not self.template_path or not self.image_path:
+            WarningDialog(self.root, "Seleccione todos los archivos correctamente")
+        else:
+            pass
+
+    
 
 
 if __name__ == "__main__":
