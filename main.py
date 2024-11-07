@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import customtkinter as ctk
 import openpyxl
 from customtkinter import filedialog
@@ -42,7 +44,7 @@ class ticket_GUI:
 
         #initialize root
         self.root = ctk.CTk()
-        self.root.geometry("800x500")
+        self.root.geometry("500x700")
         
         #ticketing variables
         self.image_path= ""
@@ -57,6 +59,11 @@ class ticket_GUI:
         self.text_image = ctk.StringVar()
         self.text_font = ctk.StringVar()
         self.tb_color = ctk.StringVar()
+        self.tb_lx_coord = ctk.StringVar()
+        self.tb_ly_coord = ctk.StringVar()
+        self.tb_nx_coord = ctk.StringVar()
+        self.tb_ny_coord = ctk.StringVar()
+        self.tb_font_size = ctk.StringVar()
 
         # Initialize text variables
         self.text_template.set("No seleccionado")
@@ -109,13 +116,46 @@ class ticket_GUI:
         self.label_hex = ctk.CTkLabel(master=self.frame,
                                        text="Color #HEX value (FFFFFF)",
                                        font=("Roboto", 14))
+        self.label_lx = ctk.CTkLabel(master=self.frame,
+                                       text="Coordenada letra x",
+                                       font=("Roboto", 14))
+        self.label_ly = ctk.CTkLabel(master=self.frame,
+                                       text="Coordenada letra y",
+                                       font=("Roboto", 14))
+        self.label_nx = ctk.CTkLabel(master=self.frame,
+                                       text="Coordenada numero x",
+                                       font=("Roboto", 14))
+        self.label_ny = ctk.CTkLabel(master=self.frame,
+                                       text="Coordenada numero y",
+                                       font=("Roboto", 14))
+        self.label_font_size = ctk.CTkLabel(master=self.frame,
+                                    text="Tamaño de fuente",
+                                    font=("Roboto", 14))
+
         
         #textboxes
         self.color_entry = ctk.CTkEntry(master=self.frame,
                                         textvariable=self.tb_color,
                                         placeholder_text="#HEX value (FFFFFF)")
-        
-        
+
+        self.letter_x_coord = ctk.CTkEntry(master=self.frame,
+                                        textvariable=self.tb_lx_coord,
+                                        placeholder_text="Letra coordenas x")
+        self.letter_y_coord = ctk.CTkEntry(master=self.frame,
+                                        textvariable=self.tb_ly_coord,
+                                        placeholder_text="Letra coordenas y")
+
+        self.number_x_coord = ctk.CTkEntry(master=self.frame,
+                                        textvariable=self.tb_nx_coord,
+                                        placeholder_text="Numero coordenas x")
+        self.number_y_coord = ctk.CTkEntry(master=self.frame,
+                                        textvariable=self.tb_ny_coord,
+                                        placeholder_text="Numero coordenas y")
+        self.font_size_entry = ctk.CTkEntry(master=self.frame,
+                                    textvariable=self.tb_font_size,
+                                    placeholder_text="Tamaño")
+
+
         # Positioning elements with grid
         self.btn_output_save.grid(row=0, column=0, padx=10, pady=12)
         self.label_output.grid(row=0, column=1, padx=10, pady=12)
@@ -131,6 +171,21 @@ class ticket_GUI:
 
         self.label_hex.grid(row=4,column=0,padx=10,pady=12)
         self.color_entry.grid(row=4,column=1, padx=10, pady=12)
+        
+        self.label_lx.grid(row=5,column=0,padx=10,pady=12)
+        self.letter_x_coord.grid(row=5,column=1, padx=10, pady=12)
+
+        self.label_ly.grid(row=6,column=0,padx=10,pady=12)
+        self.letter_y_coord.grid(row=6,column=1, padx=10, pady=12)
+
+        self.label_nx.grid(row=7,column=0,padx=10,pady=12)
+        self.number_x_coord.grid(row=7,column=1, padx=10, pady=12)
+
+        self.label_ny.grid(row=8,column=0,padx=10,pady=12)
+        self.number_y_coord.grid(row=8,column=1, padx=10, pady=12)
+
+        self.label_font_size.grid(row=9, column=0, padx=10, pady=12)
+        self.font_size_entry.grid(row=9, column=1, padx=10, pady=12)
 
         # Create a new frame for the generate button
         self.frame_generate = ctk.CTkFrame(self.root)
@@ -234,14 +289,20 @@ class ticket_GUI:
             font = ImageFont.truetype(self.font_path, size=100)
     
             # Define the position where you want to place the number
-            x1_position = 90
-            y1_position = 220
-            x2_position = 90
-            y2_position = 400
+            x1_position = int(self.letter_x_coord.get())
+            y1_position = int(self.letter_y_coord.get())
+            x2_position = int(self.number_x_coord.get())
+            y2_position = int(self.number_y_coord.get())
 
             #iterations
             num_tickets = len(data_values)
             # Loop through each ticket
+
+            # Inside generate_file method, update the font size based on user input
+            font_size = int(self.tb_font_size.get()) if self.tb_font_size.get().isdigit() else 100  # Default to 100 if empty or invalid
+
+            # Define font and size
+            font = ImageFont.truetype(self.font_path, size=font_size)
 
             if self.chk_letters.get():
                 for i in range(num_tickets):
