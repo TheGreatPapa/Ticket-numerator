@@ -364,7 +364,7 @@ class ticket_GUI:
         img_height_px = int(img_height / (1 / (ppi / 72)))
 
         # Background color in RGB for #F8F4F4
-        background_color = (248/255, 244/255, 244/255)
+        background_color = (249/255, 234/255, 225/255)
 
         # Get all image files in the save path
         image_files = sorted(Path(self.save_path).glob("ticket_*.png"))
