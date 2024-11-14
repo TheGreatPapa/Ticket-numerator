@@ -6,7 +6,9 @@ from customtkinter import filedialog
 from pygame import font
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
-
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import mm
+import os
 
 
 
@@ -17,7 +19,7 @@ class WarningDialog(ctk.CTkToplevel):
     def __init__(self, parent, message):
         super().__init__(parent)
         self.title("Warning")
-        self.geometry("400x150")
+        self.geometry("500x150")
         self.resizable(False, False)
 
         self.label = ctk.CTkLabel(self, text=message, font=("Roboto", 14))
@@ -41,11 +43,16 @@ class ticket_GUI:
     
 
     def __init__(self):
-
+        
         #initialize root
         self.root = ctk.CTk()
-        self.root.geometry("500x700")
+        self.root.geometry("400x750")
         
+        # Progress bar
+        self.progress_bar = ctk.CTkProgressBar(self.root, orientation="horizontal", mode="determinate")
+        self.progress_bar.pack(padx=10, pady=12, fill="x")
+        self.progress_bar.set(0)
+
         #ticketing variables
         self.image_path= ""
         self.save_path = ""
@@ -245,14 +252,14 @@ class ticket_GUI:
 
     def select_font_file(self):
         self.font_path = filedialog.askopenfilename(title="Seleccionar archivo Font",
-                                                     filetypes=(("Font file (*.ttf)","*.ttf"),("Font file (*.TTF)","*.TTF"),("Todos los archivos (*.*)","*.*")))
+                                                     filetypes=(("Font file (*.ttf)","*.ttf"),("Font file (*.TTF)","*.TTF"),("Font file (*.otf)","*.otf"),("Todos los archivos (*.*)","*.*")))
         if self.font_path:
             display_font = Path(self.font_path).name
             self.text_font.set(display_font)
 
             
     def generate_file(self):
-       
+        self.progress_bar.set(0)
         if not self.font_path or not self.save_path or not self.template_path or not self.image_path:
             WarningDialog(self.root, "Seleccione todos los archivos correctamente")
         else:
@@ -329,8 +336,82 @@ class ticket_GUI:
                     # Open the template again for the next iteration
                     template = Image.open(self.image_path)
                     draw = ImageDraw.Draw(template)
-
+        self.images_to_pdf()
+          # Grab the image from folder and store them in a pdf
             
+    def images_to_pdf(self):
+        pdf_path = f"{self.save_path}/tickets.pdf"
+        page_width, page_height = 279 * mm, 432 * mm
+        c = canvas.Canvas(pdf_path, pagesize=(page_width, page_height))
+
+        # User-defined layout and margins
+        images_per_sheet_layout = (8, 3)
+        document_margin = 5 * mm
+        image_margin = 2 * mm
+        rows, cols = images_per_sheet_layout
+
+        # High PPI setting for better quality
+        ppi = 300  # Set to 300 PPI for higher quality
+
+        # Calculate available width and height for images in points (1 point = 1/72 inch)
+        available_width = page_width - 2 * document_margin
+        available_height = page_height - 2 * document_margin
+        img_width = (available_width - (cols - 1) * image_margin) / cols
+        img_height = (available_height - (rows - 1) * image_margin) / rows
+
+        # Convert img_width and img_height to pixels for resizing (based on the target PPI)
+        img_width_px = int(img_width / (1 / (ppi / 72)))
+        img_height_px = int(img_height / (1 / (ppi / 72)))
+
+        # Background color in RGB for #F8F4F4
+        background_color = (248/255, 244/255, 244/255)
+
+        # Get all image files in the save path
+        image_files = sorted(Path(self.save_path).glob("ticket_*.png"))
+        if not image_files:
+            print("No images found to add to PDF.")
+            return
+
+        total_images = len(image_files)
+        progress_step = 1 / total_images  # Step increment for each image
+
+        sheet_count = 1
+        image_index = 0
+        for img_file in image_files:
+            # Draw background color for each new page
+            if image_index % (rows * cols) == 0:
+                c.setFillColorRGB(*background_color)
+                c.rect(0, 0, page_width, page_height, fill=True, stroke=False)
+
+            # Calculate position on the grid
+            row = (image_index // cols) % rows
+            col = image_index % cols
+            x_offset = document_margin + col * (img_width + image_margin)
+            y_offset = page_height - document_margin - (row + 1) * img_height - row * image_margin
+
+            # Resize the image to higher quality
+            img = Image.open(img_file)
+            img = img.resize((img_width_px, img_height_px), Image.ANTIALIAS)
+            temp_img_path = f"{self.save_path}/temp_{img_file.name}"
+            img.save(temp_img_path, dpi=(ppi, ppi))
+            c.drawImage(temp_img_path, x_offset, y_offset, width=img_width, height=img_height)
+            os.remove(temp_img_path)
+
+            image_index += 1
+
+            # Update the progress bar
+            self.progress_bar.set(min(1, self.progress_bar.get() + progress_step))
+
+            # Start a new page if the current sheet is filled
+            if image_index % (rows * cols) == 0:
+                c.showPage()
+                sheet_count += 1
+
+        if image_index % (rows * cols) != 0:
+            c.showPage()  # Ensure the last page is added if partially filled
+
+        c.save()
+        print(f"PDF with {sheet_count} sheet(s) successfully generated at {pdf_path}")
 
 if __name__ == "__main__":
     main()
