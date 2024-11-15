@@ -347,7 +347,7 @@ class ticket_GUI:
         # User-defined layout and margins
         images_per_sheet_layout = (8, 3)
         document_margin = 5 * mm
-        image_margin = 2 * mm
+        image_margin = 0.5 * mm
         rows, cols = images_per_sheet_layout
 
         # High PPI setting for better quality
@@ -415,5 +415,3 @@ class ticket_GUI:
 
 if __name__ == "__main__":
     main()
-
-
